@@ -29,12 +29,12 @@ mysqli_close($conn);
 <html>
 <head>
     <title>Filtre par catégorie</title>
-    <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid black; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        select, input { margin: 10px 0; }
-    </style>
+        <meta charset="UTF-8">
+  <link rel="stylesheet" href="../assets/css/1.css">
+    <link rel="stylesheet" href="bootstrap-5.3.5-dist/css/bootstrap.min.css">
+    <script src="bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js"></script>
+
+   
 </head>
 <body>
     <h2>Filtre par catégorie</h2>

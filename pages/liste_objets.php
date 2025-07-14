@@ -20,8 +20,16 @@ mysqli_close($conn);
 <html>
 <head>
     <title>Liste des objets</title>
+     <link rel="stylesheet" href="../assets/css/1.css">
+    <link rel="stylesheet" href="bootstrap-5.3.5-dist/css/bootstrap.min.css">
+    <script src="bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js"></script>
+    <meta charset="UTF-8">
+
+
 </head>
 <body>
+    <p><a href="deconnexion.php">Deconnexion</a></p>
+    <p><a href="filtre_categorie.php">Filtre</a></p>
     <h2>Liste des objets</h2>
     <table>
         <tr>
@@ -41,6 +49,6 @@ mysqli_close($conn);
         </tr>
         <?php endforeach; ?>
     </table>
-    <p><a href="login.php">Retour à la connexion</a></p>
+   
 </body>
 </html>
