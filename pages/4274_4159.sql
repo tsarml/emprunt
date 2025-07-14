@@ -157,3 +157,5 @@ INSERT INTO image_objet (id_objet, nom_image) VALUES
 (38, 'testeur_batterie.jpg'),
 (39, 'hachoir.jpg'),
 (40, 'plancha.jpg');
+
+ALTER TABLE image_objet ADD est_principale BOOLEAN DEFAULT FALSE;
