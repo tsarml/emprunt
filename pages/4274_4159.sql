@@ -159,3 +159,4 @@ INSERT INTO image_objet (id_objet, nom_image) VALUES
 (40, 'plancha.jpg');
 
 ALTER TABLE image_objet ADD est_principale BOOLEAN DEFAULT FALSE;
+UPDATE image_objet SET est_principale = CONCAT('../assets/images/', nom_image);
