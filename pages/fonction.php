@@ -3,7 +3,7 @@ function connecterBDD() {
     $serveur = "localhost";
     $utilisateur = "root";
     $motdepasse = "";
-    $basededonnees = "emprunt";
+    $basededonnees = "emprunt2";
     
     $conn = mysqli_connect($serveur, $utilisateur, $motdepasse, $basededonnees);
     

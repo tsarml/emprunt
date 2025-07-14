@@ -22,7 +22,10 @@ if ($disponible) $conditions[] = "e.date_retour IS NULL";
 
 $query = "
     SELECT o.id_objet, o.nom_objet, m.id_membre, m.nom AS proprietaire, c.nom_categorie, 
-           COALESCE((SELECT nom_image FROM image_objet WHERE id_objet = o.id_objet AND est_principale = 1 LIMIT 1), 'assets/images/default.jpg') AS nom_image, 
+           COALESCE(
+               (SELECT nom_image FROM image_objet WHERE id_objet = o.id_objet AND est_principale = 1 LIMIT 1),
+               (SELECT nom_image FROM image_objet WHERE id_objet = o.id_objet LIMIT 1)
+           ) AS nom_image, 
            e.date_emprunt, e.date_retour
     FROM objet o
     JOIN membre m ON o.id_membre = m.id_membre
@@ -35,6 +38,21 @@ $query .= " ORDER BY m.nom, c.nom_categorie";
 $result = mysqli_query($conn, $query);
 $objects = mysqli_fetch_all($result, MYSQLI_ASSOC);
 mysqli_close($conn);
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['emprunter']) && isset($_POST['id_objet']) && isset($_POST['jours'])) {
+    $id_objet = (int)$_POST['id_objet'];
+    $jours = (int)$_POST['jours'];
+    $id_membre = (int)$_SESSION['id_membre'];
+    $date_emprunt = date('Y-m-d');
+    $date_retour = date('Y-m-d', strtotime("+$jours days"));
+
+    $conn = connecterBDD();
+    $query = "INSERT INTO emprunt (id_objet, id_membre, date_emprunt, date_retour) VALUES ($id_objet, $id_membre, '$date_emprunt', '$date_retour')";
+    mysqli_query($conn, $query);
+    mysqli_close($conn);
+    header("Location: liste_objets.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -59,7 +77,6 @@ mysqli_close($conn);
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link active" href="liste_objets.php">Liste objets</a></li>
                 <li class="nav-item"><a class="nav-link" href="ajout_objet.php">Ajouter objet</a></li>
-                <li class="nav-item"><a class="nav-link" href="fiche_membre.php?id_membre=<?php echo $_SESSION['id_membre']; ?>">Profil</a></li>
                 <li class="nav-item"><a class="nav-link" href="deconnexion.php">Déconnexion</a></li>
             </ul>
         </div>
@@ -74,41 +91,42 @@ mysqli_close($conn);
 <form method="post" class="mb-4">
 <div class="row align-items-end">
 <div class="col-md-4">
-    <label for="nom_objet" class="form-label">Nom objet</label>
-    <input type="text" class="form-control" id="nom_objet" name="nom_objet" value="<?php echo htmlspecialchars($nom_objet); ?>">
+<label for="nom_objet" class="form-label">Nom objet</label>
+<input type="text" class="form-control" id="nom_objet" name="nom_objet" value="<?php echo htmlspecialchars($nom_objet); ?>">
 </div>
 <div class="col-md-4">
-    <label for="id_categorie" class="form-label">Catégorie</label>
-    <select name="id_categorie" id="id_categorie" class="form-select">
-        <option value="">Toutes catégories</option>
-        <?php foreach ($categories as $cat): ?>
-            <option value="<?php echo $cat['id_categorie']; ?>" <?php if ($id_categorie == $cat['id_categorie']) echo 'selected'; ?>><?php echo htmlspecialchars($cat['nom_categorie']); ?></option>
-        <?php endforeach; ?>
-    </select>
+<label for="id_categorie" class="form-label">Catégorie</label>
+<select name="id_categorie" id="id_categorie" class="form-select">
+    <option value="">Toutes catégories</option>
+    <?php foreach ($categories as $cat): ?>
+        <option value="<?php echo $cat['id_categorie']; ?>" <?php if ($id_categorie == $cat['id_categorie']) echo 'selected'; ?>><?php echo htmlspecialchars($cat['nom_categorie']); ?></option>
+    <?php endforeach; ?>
+</select>
 </div>
 <div class="col-md-2">
-    <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="disponible" name="disponible" <?php if ($disponible) echo 'checked'; ?>>
-        <label class="form-check-label" for="disponible">Disponible</label>
-    </div>
+<div class="form-check">
+    <input type="checkbox" class="form-check-input" id="disponible" name="disponible" <?php if ($disponible) echo 'checked'; ?>>
+    <label class="form-check-label" for="disponible">Disponible</label>
+</div>
 </div>
 <div class="col-md-2">
-    <button type="submit" class="btn btn-primary">Rechercher</button>
+<button type="submit" class="btn btn-primary">Rechercher</button>
 </div>
 </div>
 </form>
 <div class="table-responsive">
 <table class="table table-striped">
 <thead class="table-dark">
-    <tr>
-        <th>Objet</th>
-        <th>Propriétaire</th>
-        <th>Catégorie</th>
-        <th>Image</th>
-        <th>Date emprunt</th>
-        <th>Date retour</th>
-        <th>Statut</th>
-    </tr>
+<tr>
+    <th>Objet</th>
+    <th>Propriétaire</th>
+    <th>Catégorie</th>
+    <th>Image</th>
+    <th>Date emprunt</th>
+    <th>Date retour</th>
+    <th>Disponible le</th>
+    <th>Action</th>
+</tr>
 </thead>
 <tbody>
 <?php foreach ($objects as $obj): ?>
@@ -119,7 +137,16 @@ mysqli_close($conn);
         <td><img src="<?php echo htmlspecialchars($obj['nom_image']); ?>" alt="Image objet" style="max-width: 100px;"></td>
         <td><?php echo $obj['date_emprunt'] ? htmlspecialchars($obj['date_emprunt']) : '-'; ?></td>
         <td><?php echo $obj['date_retour'] ? htmlspecialchars($obj['date_retour']) : '-'; ?></td>
-        <td><?php echo $obj['date_retour'] ? '<span class="badge bg-warning text-dark">Emprunté</span>' : '<span class="badge bg-success">Disponible</span>'; ?></td>
+        <td><?php echo $obj['date_retour'] ? htmlspecialchars($obj['date_retour']) : '-'; ?></td>
+        <td>
+            <?php if (!$obj['date_retour']): ?>
+                <form method="post" style="display:inline;">
+                    <input type="hidden" name="id_objet" value="<?php echo $obj['id_objet']; ?>">
+                    <input type="number" name="jours" min="1" max="30" value="7" style="width: 60px; margin-right: 5px;">
+                    <button type="submit" name="emprunter" class="btn btn-success btn-sm">Emprunter</button>
+                </form>
+            <?php endif; ?>
+        </td>
     </tr>
 <?php endforeach; ?>
 </tbody>

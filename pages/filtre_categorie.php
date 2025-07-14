@@ -43,7 +43,7 @@ mysqli_close($conn);
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="liste_objets.php">
-            <img src="Uploads/logo.png" alt="Needit Logo" style="height: 40px;">
+            <img src="../assets/images/logo.jpg" alt="Needit Logo" style="height: 40px;">
             Needit
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -54,7 +54,6 @@ mysqli_close($conn);
                 <li class="nav-item"><a class="nav-link" href="liste_objets.php">Liste objets</a></li>
                 <li class="nav-item"><a class="nav-link" href="ajout_objet.php">Ajouter objet</a></li>
                 <li class="nav-item"><a class="nav-link active" href="filtre_categorie.php">Filtrer catégorie</a></li>
-                <li class="nav-item"><a class="nav-link" href="fiche_membre.php?id_membre=<?php echo $_SESSION['id_membre']; ?>">Profil</a></li>
                 <li class="nav-item"><a class="nav-link" href="deconnexion.php">Déconnexion</a></li>
             </ul>
         </div>
