@@ -82,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['emprunter']) && isset(
         </div>
     </div>
 </nav>
+ 
 <div class="container mt-5 pt-5">
 <div class="row">
 <div class="col-12">
@@ -151,6 +152,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['emprunter']) && isset(
 <?php endforeach; ?>
 </tbody>
 </table>
+<div class="mt-3">
+ <a href="etat_objets.php" class="btn btn-info">Voir l'état des objets retournés</a>
+ </div>
 </div>
 </div>
 </div>

@@ -7,13 +7,8 @@ if (!estConnecte()) {
     exit();
 }
 
-if (!isset($_GET['id_membre'])) {
-    header("Location: liste_objets.php");
-    exit();
-}
-
 $conn = connecterBDD();
-$id_membre = (int)$_GET['id_membre'];
+$id_membre = (int)$_SESSION['id_membre']; // Utilise l'ID du membre connecté directement
 
 $result_membre = mysqli_query($conn, "SELECT nom, date_de_naissance, genre, email, ville, image_profil FROM membre WHERE id_membre = $id_membre");
 $membre = mysqli_fetch_assoc($result_membre);
@@ -23,23 +18,19 @@ if (!$membre) {
     exit();
 }
 
-$result_objets = mysqli_query($conn, "
-    SELECT o.id_objet, o.nom_objet, c.nom_categorie, 
-           COALESCE((SELECT nom_image FROM image_objet WHERE id_objet = o.id_objet AND est_principale = 1 LIMIT 1), 'default.jpg') AS nom_image,
-           e.date_retour
-    FROM objet o
-    JOIN categorie_objet c ON o.id_categorie = c.id_categorie
-    LEFT JOIN emprunt e ON o.id_objet = e.id_objet AND e.date_retour IS NULL
-    WHERE o.id_membre = $id_membre
-    ORDER BY c.nom_categorie, o.nom_objet
+$result_emprunts = mysqli_query($conn, "
+    SELECT e.id_emprunt, o.id_objet, o.nom_objet, 
+           COALESCE((SELECT nom_image FROM image_objet WHERE id_objet = o.id_objet AND est_principale = 1 LIMIT 1), 
+                    (SELECT nom_image FROM image_objet WHERE id_objet = o.id_objet LIMIT 1)) AS nom_image,
+           e.date_emprunt, e.date_retour
+    FROM emprunt e
+    JOIN objet o ON e.id_objet = o.id_objet
+    WHERE e.id_membre = $id_membre AND e.date_retour IS NULL
+    ORDER BY e.date_emprunt DESC
 ");
-$objects = mysqli_fetch_all($result_objets, MYSQLI_ASSOC);
-mysqli_close($conn);
+$emprunts = mysqli_fetch_all($result_emprunts, MYSQLI_ASSOC);
 
-$objects_by_category = [];
-foreach ($objects as $obj) {
-    $objects_by_category[$obj['nom_categorie']][] = $obj;
-}
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -64,58 +55,75 @@ foreach ($objects as $obj) {
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="liste_objets.php">Liste objets</a></li>
                 <li class="nav-item"><a class="nav-link" href="ajout_objet.php">Ajouter objet</a></li>
+                <li class="nav-item"><a class="nav-link active" href="fiche_membre.php?id_membre=<?php echo $_SESSION['id_membre']; ?>">Mon profil</a></li>
                 <li class="nav-item"><a class="nav-link" href="deconnexion.php">Déconnexion</a></li>
             </ul>
         </div>
     </div>
 </nav>
 <div class="container mt-5 pt-5">
-<div class="row">
-<div class="col-12">
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h3>Fiche : <?php echo htmlspecialchars($membre['nom']); ?></h3>
-        <a href="liste_objets.php" class="btn btn-secondary">Retour</a>
-</div>
-<div class="card-body">
-<h4>Infos membre</h4>
-<p><strong>Nom :</strong> <?php echo htmlspecialchars($membre['nom']); ?></p>
-<p><strong>Date de naissance :</strong> <?php echo htmlspecialchars($membre['date_de_naissance']); ?></p>
-<p><strong>Genre :</strong> <?php echo htmlspecialchars($membre['genre']); ?></p>
-<p><strong>Email :</strong> <?php echo htmlspecialchars($membre['email']); ?></p>
-<p><strong>Ville :</strong> <?php echo htmlspecialchars($membre['ville']); ?></p>
-<p><strong>Photo :</strong> <img src="Uploads/<?php echo htmlspecialchars($membre['image_profil'] ?: 'default.jpg'); ?>" alt="Photo profil" style="max-width: 100px;"></p>
-<hr>
-<h4>Objets</h4>
-<?php if ($objects): ?>
-<?php foreach ($objects_by_category as $categorie => $objets): ?>
-    <h5><?php echo htmlspecialchars($categorie); ?></h5>
-    <table class="table table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Objet</th>
-                <th>Image</th>
-                <th>Statut</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($objets as $obj): ?>
-                <tr>
-                    <td><a href="fiche_objet.php?id_objet=<?php echo $obj['id_objet']; ?>"><?php echo htmlspecialchars($obj['nom_objet']); ?></a></td>
-                    <td><img src="Uploads/<?php echo htmlspecialchars($obj['nom_image']); ?>" alt="Image objet" style="max-width: 100px;"></td>
-                    <td><?php echo $obj['date_retour'] ? '<span class="badge bg-warning text-dark">Emprunté</span>' : '<span class="badge bg-success">Disponible</span>'; ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-<?php endforeach; ?>
-<?php else: ?>
-    <p>Aucun objet.</p>
-<?php endif; ?>
-</div>
-</div>
-</div>
-</div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>Fiche : <?php echo htmlspecialchars($membre['nom']); ?></h3>
+                    <a href="liste_objets.php" class="btn btn-secondary">Retour</a>
+                </div>
+                <div class="card-body">
+                    <h4>Infos membre</h4>
+                    <p><strong>Nom :</strong> <?php echo htmlspecialchars($membre['nom']); ?></p>
+                    <p><strong>Date de naissance :</strong> <?php echo htmlspecialchars($membre['date_de_naissance']); ?></p>
+                    <p><strong>Genre :</strong> <?php echo htmlspecialchars($membre['genre']); ?></p>
+                    <p><strong>Email :</strong> <?php echo htmlspecialchars($membre['email']); ?></p>
+                    <p><strong>Ville :</strong> <?php echo htmlspecialchars($membre['ville']); ?></p>
+                    <p><strong>Photo :</strong> 
+                        <img src="../assets/images/<?php echo htmlspecialchars($membre['image_profil'] ?: 'default.jpg'); ?>" 
+                             alt="Photo profil" 
+                             style="max-width: 100px;" 
+                             onerror="this.src='../assets/images/default.jpg';"> <!-- Fallback image -->
+                    </p>
+                    <hr>
+                    <h4>Emprunts en cours</h4>
+                    <?php if ($emprunts): ?>
+                        <table class="table table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Objet</th>
+                                    <th>Image</th>
+                                    <th>Date emprunt</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($emprunts as $emprunt): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($emprunt['nom_objet']); ?></td>
+                                        <td><img src="<?php echo htmlspecialchars($emprunt['nom_image']); ?>" 
+                                                 alt="Image objet" 
+                                                 style="max-width: 100px;" 
+                                                 onerror="this.src='../assets/images/default.jpg';"> <!-- Fallback image -->
+                                        </td>
+                                        <td><?php echo htmlspecialchars($emprunt['date_emprunt']); ?></td>
+                                        <td>
+                                            <form method="post" action="retour_objet.php" style="display:inline;">
+                                                <input type="hidden" name="id_emprunt" value="<?php echo $emprunt['id_emprunt']; ?>">
+                                                <button type="submit" class="btn btn-danger btn-sm">Retour</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>Aucun emprunt pour le moment.</p>
+                    <?php endif; ?>
+                    <div class="mt-3">
+                        <a href="etat_objets.php" class="btn btn-info">Voir l'état des objets retournés</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

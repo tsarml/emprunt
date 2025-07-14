@@ -160,3 +160,4 @@ INSERT INTO image_objet (id_objet, nom_image) VALUES
 
 ALTER TABLE image_objet ADD est_principale BOOLEAN DEFAULT FALSE;
 UPDATE image_objet SET est_principale = CONCAT('../assets/images/', nom_image);
+ALTER TABLE emprunt ADD COLUMN etat VARCHAR(10);
