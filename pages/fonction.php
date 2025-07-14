@@ -54,4 +54,10 @@ function estConnecte() {
     return isset($_SESSION['id_membre']);
 }
 
+function deconnexion() {
+    session_start();
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
 ?>

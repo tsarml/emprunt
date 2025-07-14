@@ -20,35 +20,67 @@ mysqli_close($conn);
 <html>
 <head>
     <title>Liste des objets</title>
-     <link rel="stylesheet" href="../assets/css/1.css">
-    <link rel="stylesheet" href="bootstrap-5.3.5-dist/css/bootstrap.min.css">
-    <script src="bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js"></script>
     <meta charset="UTF-8">
-
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <p><a href="deconnexion.php">Deconnexion</a></p>
-    <p><a href="filtre_categorie.php">Filtre</a></p>
-    <h2>Liste des objets</h2>
-    <table>
-        <tr>
-            <th>Objet</th>
-            <th>Propriétaire</th>
-            <th>Catégorie</th>
-            <th>Image</th>
-            <th>Date de retour</th>
-        </tr>
-        <?php foreach ($objects as $obj): ?>
-        <tr>
-            <td><?php echo $obj['nom_objet']; ?></td>
-            <td><?php echo $obj['proprietaire']; ?></td>
-            <td><?php echo $obj['nom_categorie']; ?></td>
-            <td><?php echo $obj['nom_image'] ? $obj['nom_image'] : 'Aucune image'; ?></td>
-            <td><?php echo $obj['date_retour'] ? $obj['date_retour'] : 'Non emprunté'; ?></td>
-        </tr>
-        <?php endforeach; ?>
-    </table>
-   
+<body class="bg-light">
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Liste des objets</h3>
+                        <div>
+                            <a href="filtre_categorie.php" class="btn btn-info me-2">Filtrer</a>
+                            <a href="deconnexion.php" class="btn btn-danger">Déconnexion</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Objet</th>
+                                        <th>Propriétaire</th>
+                                        <th>Catégorie</th>
+                                        <th>Image</th>
+                                        <th>Date de retour</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($objects as $obj): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($obj['nom_objet']); ?></td>
+                                        <td><?php echo htmlspecialchars($obj['proprietaire']); ?></td>
+                                        <td>
+                                            <span class="badge bg-secondary"><?php echo htmlspecialchars($obj['nom_categorie']); ?></span>
+                                        </td>
+                                        <td>
+                                            <?php if ($obj['nom_image']): ?>
+                                                <i class="bi bi-image"></i> <?php echo htmlspecialchars($obj['nom_image']); ?>
+                                            <?php else: ?>
+                                                <span class="text-muted">Aucune image</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($obj['date_retour']): ?>
+                                                <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($obj['date_retour']); ?></span>
+                                            <?php else: ?>
+                                                <span class="badge bg-success">Disponible</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

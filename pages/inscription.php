@@ -25,67 +25,90 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html>
 <head>
     <title>Inscription</title>
-  <link rel="stylesheet" href="../assets/css/1.css">
-    <link rel="stylesheet" href="bootstrap-5.3.5-dist/css/bootstrap.min.css">
-    <script src="bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h2>Inscription</h2>
-    
-    <?php if ($erreur): ?>
-        <div class="error"><?php echo $erreur; ?></div>
-    <?php endif; ?>
-    
-    <?php if ($succes): ?>
-        <div class="success"><?php echo $succes; ?></div>
-    <?php endif; ?>
-    
-    <form method="POST">
-        <div class="form-group">
-            <label for="nom">Nom:</label>
-            <input type="text" id="nom" name="nom" required>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="text-center">Inscription</h3>
+                    </div>
+                    <div class="card-body">
+                        <?php if ($erreur): ?>
+                            <div class="alert alert-danger"><?php echo $erreur; ?></div>
+                        <?php endif; ?>
+                        
+                        <?php if ($succes): ?>
+                            <div class="alert alert-success"><?php echo $succes; ?></div>
+                        <?php endif; ?>
+                        
+                        <form method="POST">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="nom" class="form-label">Nom</label>
+                                        <input type="text" class="form-control" id="nom" name="nom" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="date_naissance" class="form-label">Date de naissance</label>
+                                        <input type="date" class="form-control" id="date_naissance" name="date_naissance" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="genre" class="form-label">Genre</label>
+                                        <select class="form-select" id="genre" name="genre" required>
+                                            <option value="">Sélectionnez</option>
+                                            <option value="Homme">Homme</option>
+                                            <option value="Femme">Femme</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="ville" class="form-label">Ville</label>
+                                        <input type="text" class="form-control" id="ville" name="ville" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="mdp" class="form-label">Mot de passe</label>
+                                <input type="password" class="form-control" id="mdp" name="mdp" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="image_profil" class="form-label">Image de profil</label>
+                                <input type="text" class="form-control" id="image_profil" name="image_profil" placeholder="Nom du fichier image">
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success">S'inscrire</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="login.php" class="text-decoration-none">Déjà inscrit ? Se connecter</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="form-group">
-            <label for="date_naissance">Date de naissance:</label>
-            <input type="date" id="date_naissance" name="date_naissance" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="genre">Genre:</label>
-            <select id="genre" name="genre" required>
-                <option value="">Sélectionnez</option>
-                <option value="Homme">Homme</option>
-                <option value="Femme">Femme</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="ville">Ville:</label>
-            <input type="text" id="ville" name="ville" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="mdp">Mot de passe:</label>
-            <input type="password" id="mdp" name="mdp" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="image_profil">Image de profil:</label>
-            <input type="text" id="image_profil" name="image_profil" placeholder="Nom du fichier image">
-        </div>
-        
-        <button type="submit">S'inscrire</button>
-    </form>
-    
-    <div class="link">
-        <a href="login.php">Déjà inscrit ? Se connecter</a>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

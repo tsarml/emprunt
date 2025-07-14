@@ -29,48 +29,88 @@ mysqli_close($conn);
 <html>
 <head>
     <title>Filtre par catégorie</title>
-        <meta charset="UTF-8">
-  <link rel="stylesheet" href="../assets/css/1.css">
-    <link rel="stylesheet" href="bootstrap-5.3.5-dist/css/bootstrap.min.css">
-    <script src="bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js"></script>
-
-   
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h2>Filtre par catégorie</h2>
-    <form method="post">
-        <label>Choisir une catégorie:</label>
-        <select name="id_categorie" required>
+<body class="bg-light">
+<div class="container mt-4">
+<div class="row">
+<div class="col-12">
+<div class="card">
+    <div class="card-header">
+        <h3 class="mb-0">Filtre par catégorie</h3>
+    </div>
+<div class="card-body">
+<form method="post" class="mb-4">
+<div class="row align-items-end">
+    <div class="col-md-8">
+        <label for="id_categorie" class="form-label">Choisir une catégorie</label>
+        <select name="id_categorie" id="id_categorie" class="form-select" required>
             <option value="">Sélectionner une catégorie</option>
             <?php foreach ($categories as $cat): ?>
             <option value="<?php echo $cat['id_categorie']; ?>" <?php if ($selected_categorie == $cat['id_categorie']) echo 'selected'; ?>>
-                <?php echo $cat['nom_categorie']; ?>
+                <?php echo htmlspecialchars($cat['nom_categorie']); ?>
             </option>
             <?php endforeach; ?>
         </select>
-        <input type="submit" value="Filtrer">
-    </form>
-    <?php if ($objects): ?>
-    <table>
-        <tr>
-            <th>Objet</th>
-            <th>Propriétaire</th>
-            <th>Catégorie</th>
-            <th>Image</th>
-            <th>Date de retour</th>
-        </tr>
-        <?php foreach ($objects as $obj): ?>
-        <tr>
-            <td><?php echo $obj['nom_objet']; ?></td>
-            <td><?php echo $obj['proprietaire']; ?></td>
-            <td><?php echo $obj['nom_categorie']; ?></td>
-            <td><?php echo $obj['nom_image'] ? $obj['nom_image'] : 'Aucune image'; ?></td>
-            <td><?php echo $obj['date_retour'] ? $obj['date_retour'] : 'Non emprunté'; ?></td>
-        </tr>
-        <?php endforeach; ?>
-    </table>
-    <?php endif; ?>
-    <p><a href="liste_objets.php">Retour à la liste complète</a></p>
-    <p><a href="login.php">Retour à la connexion</a></p>
+    </div>
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+    </div>
+</div>
+</form>
+        
+<?php if ($objects): ?>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Objet</th>
+                <th>Propriétaire</th>
+                <th>Catégorie</th>
+                <th>Image</th>
+                <th>Date de retour</th>
+            </tr>
+        </thead>
+<tbody>
+    <?php foreach ($objects as $obj): ?>
+    <tr>
+        <td><?php echo htmlspecialchars($obj['nom_objet']); ?></td>
+        <td><?php echo htmlspecialchars($obj['proprietaire']); ?></td>
+        <td>
+            <span class="badge bg-secondary"><?php echo htmlspecialchars($obj['nom_categorie']); ?></span>
+        </td>
+        <td>
+            <?php if ($obj['nom_image']): ?>
+                <i class="bi bi-image"></i> <?php echo htmlspecialchars($obj['nom_image']); ?>
+            <?php else: ?>
+                <span class="text-muted">Aucune image</span>
+            <?php endif; ?>
+        </td>
+        <td>
+            <?php if ($obj['date_retour']): ?>
+                <span class="badge bg-warning text-dark"><?php echo htmlspecialchars($obj['date_retour']); ?></span>
+            <?php else: ?>
+                <span class="badge bg-success">Disponible</span>
+            <?php endif; ?>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</tbody>
+</table>
+</div>
+<?php endif; ?>
+</div>
+<div class="card-footer">
+<a href="liste_objets.php" class="btn btn-secondary me-2">Retour à la liste complète</a>
+<a href="login.php" class="btn btn-outline-primary">Retour à la connexion</a>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
